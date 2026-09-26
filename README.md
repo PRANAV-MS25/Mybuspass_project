@@ -210,14 +210,14 @@ Student sees status update on dashboard & application detail page
 ### 1. Authentication & Onboarding
 | Login Page | Registration Page |
 | :---: | :---: |
-| ![Login](login.png) | ![Register](register.png) |
+| ![Login](https://raw.githubusercontent.com/PRANAV-MS25/Mybuspass_project/main/login.png) | ![Register](https://raw.githubusercontent.com/PRANAV-MS25/Mybuspass_project/main/register.png) |
 
 ### 2. Student Portal & Applications
 | Student Dashboard | Bus Pass Application |
 | :---: | :---: |
-| ![Student Dashboard](student_dashboard.png) | ![Student Application](student_application.png) |
+| ![Student Dashboard](https://raw.githubusercontent.com/PRANAV-MS25/Mybuspass_project/main/student_dashboard.png) | ![Student Application](https://raw.githubusercontent.com/PRANAV-MS25/Mybuspass_project/main/student_application.png) |
 
 ### 3. Admin Panel & Management
 | Admin Dashboard | Application Approvals | Route Management |
 | :---: | :---: | :---: |
-| ![Admin Dashboard](admin_dashboard.png) | ![Admin Approval](admin_approval.png) | ![Routes](routes.png) |
+| ![Admin Dashboard](https://raw.githubusercontent.com/PRANAV-MS25/Mybuspass_project/main/admin_dashboard.png) | ![Admin Approval](https://raw.githubusercontent.com/PRANAV-MS25/Mybuspass_project/main/admin_approval.png) | ![Routes](https://raw.githubusercontent.com/PRANAV-MS25/Mybuspass_project/main/routes.png) |
