@@ -203,3 +203,21 @@ Student sees status update on dashboard & application detail page
 - Filter applications by status
 - Responsive sidebar layout
 - SQLite database (no extra setup needed)
+
+
+## 📸 Project Screenshots
+
+### 1. Authentication & Onboarding
+| Login Page | Registration Page |
+| :---: | :---: |
+| ![Login](login.png) | ![Register](register.png) |
+
+### 2. Student Portal & Applications
+| Student Dashboard | Bus Pass Application |
+| :---: | :---: |
+| ![Student Dashboard](student_dashboard.png) | ![Student Application](student_application.png) |
+
+### 3. Admin Panel & Management
+| Admin Dashboard | Application Approvals | Route Management |
+| :---: | :---: | :---: |
+| ![Admin Dashboard](admin_dashboard.png) | ![Admin Approval](admin_approval.png) | ![Routes](routes.png) |
