@@ -1,0 +1,38 @@
+{% extends 'core/base.html' %}
+{% block title %}Bus Routes{% endblock %}
+{% block page_title %}Bus Routes{% endblock %}
+{% block topbar_actions %}<a href="{% url 'admin_route_add' %}" class="btn btn-primary btn-sm">+ Add Route</a>{% endblock %}
+{% block content %}
+<div class="table-card">
+  {% if routes %}
+  <table>
+    <thead><tr><th>Route No.</th><th>Name</th><th>Timing</th><th>Pickup Points</th><th>Distance</th><th>Monthly Fee</th><th>Status</th><th>Actions</th></tr></thead>
+    <tbody>
+      {% for route in routes %}
+      <tr>
+        <td><strong>{{ route.route_number }}</strong></td>
+        <td>{{ route.route_name }}</td>
+        <td>{{ route.start_time|time:"H:i" }} – {{ route.end_time|time:"H:i" }}</td>
+        <td style="max-width:200px;font-size:12px;color:#6b7280;">{{ route.pickup_points|truncatechars:60 }}</td>
+        <td>{{ route.distance_km }} km</td>
+        <td>₹{{ route.monthly_fee }}</td>
+        <td>
+          {% if route.is_active %}<span class="badge badge-approved">Active</span>
+          {% else %}<span class="badge badge-rejected">Inactive</span>{% endif %}
+        </td>
+        <td>
+          <a href="{% url 'admin_route_edit' route.pk %}" class="btn btn-sm btn-outline">Edit</a>
+          <form method="post" action="{% url 'admin_route_delete' route.pk %}" style="display:inline" onsubmit="return confirm('Delete this route?')">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-danger">Del</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state"><div class="icon">🗺️</div><h3>No routes yet</h3><a href="{% url 'admin_route_add' %}" class="btn btn-primary" style="margin-top:16px;">Add First Route</a></div>
+  {% endif %}
+</div>
+{% endblock %}

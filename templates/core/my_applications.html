@@ -1,0 +1,39 @@
+{% extends 'core/base.html' %}
+{% block title %}My Applications{% endblock %}
+{% block page_title %}My Applications{% endblock %}
+{% block topbar_actions %}<a href="{% url 'apply_pass' %}" class="btn btn-primary btn-sm">+ New Application</a>{% endblock %}
+{% block content %}
+{% if applications %}
+<div class="table-card">
+  <table>
+    <thead><tr><th>Route</th><th>Pickup</th><th>Duration</th><th>Total Fee</th><th>Status</th><th>Applied</th><th>Valid Until</th><th></th></tr></thead>
+    <tbody>
+      {% for app in applications %}
+      <tr>
+        <td>
+          <strong>{{ app.route.route_number }}</strong><br>
+          <span style="color:#6b7280;font-size:12px;">{{ app.route.route_name }}</span>
+        </td>
+        <td>{{ app.pickup_point }}</td>
+        <td>{{ app.get_duration_months_display }}</td>
+        <td>₹{{ app.total_fee }}</td>
+        <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
+        <td>{{ app.applied_at|date:"d M Y" }}</td>
+        <td>{% if app.valid_until %}{{ app.valid_until|date:"d M Y" }}{% else %}—{% endif %}</td>
+        <td><a href="{% url 'application_detail' app.pk %}" class="btn btn-outline btn-sm">View</a></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="icon">🎫</div>
+    <h3>No applications yet</h3>
+    <p>You haven't applied for any bus passes yet.</p>
+    <a href="{% url 'apply_pass' %}" class="btn btn-primary" style="margin-top:16px;">Apply Now</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,76 @@
+{% extends 'core/base.html' %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Admin Dashboard{% endblock %}
+{% block content %}
+<div class="stats-grid">
+  <div class="stat-card blue"><div class="label">Total Students</div><div class="value">{{ stats.students }}</div></div>
+  <div class="stat-card blue"><div class="label">Active Routes</div><div class="value">{{ stats.routes }}</div></div>
+  <div class="stat-card yellow"><div class="label">Pending</div><div class="value">{{ stats.pending }}</div></div>
+  <div class="stat-card green"><div class="label">Approved</div><div class="value">{{ stats.approved }}</div></div>
+  <div class="stat-card red"><div class="label">Rejected</div><div class="value">{{ stats.rejected }}</div></div>
+  <div class="stat-card"><div class="label">Total Applications</div><div class="value">{{ stats.total }}</div></div>
+</div>
+
+<div class="table-card">
+  <div class="table-header">
+    <h3>Recent Applications</h3>
+    <a href="{% url 'admin_applications' %}" class="btn btn-outline btn-sm">View All</a>
+  </div>
+  {% if recent %}
+  <table>
+    <thead><tr><th>Student</th><th>Route</th><th>Pickup</th><th>Fee</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for app in recent %}
+      <tr>
+        <td><strong>{{ app.student.user.get_full_name }}</strong><br><span style="color:#6b7280;font-size:12px;">{{ app.student.roll_number }}</span></td>
+        <td>{{ app.route.route_number }}</td>
+        <td>{{ app.pickup_point }}</td>
+        <td>₹{{ app.total_fee }}</td>
+        <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
+        <td>{{ app.applied_at|date:"d M Y" }}</td>
+        <td>
+          {% if app.status == 'pending' %}
+          <button onclick="openModal({{ app.pk }})" class="btn btn-sm btn-primary">Review</button>
+          {% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state"><div class="icon">📋</div><h3>No applications yet</h3></div>
+  {% endif %}
+</div>
+
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal">
+    <h3>Update Application Status</h3>
+    <form method="post" id="reviewForm" action="">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>New Status</label>
+        <select name="status">
+          <option value="approved">✅ Approve</option>
+          <option value="rejected">❌ Reject</option>
+          <option value="pending">⏳ Keep Pending</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Remarks (optional)</label>
+        <textarea name="remarks" rows="3" placeholder="Add any notes..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" onclick="closeModal()" class="btn btn-outline">Cancel</button>
+        <button type="submit" class="btn btn-primary">Update</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+function openModal(id) {
+  document.getElementById('reviewForm').action = '/admin-panel/applications/' + id + '/update/';
+  document.getElementById('reviewModal').classList.add('open');
+}
+function closeModal() { document.getElementById('reviewModal').classList.remove('open'); }
+</script>
+{% endblock %}

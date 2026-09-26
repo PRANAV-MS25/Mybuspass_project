@@ -1,0 +1,67 @@
+{% extends 'core/base.html' %}
+{% block title %}All Applications{% endblock %}
+{% block page_title %}Manage Applications{% endblock %}
+{% block content %}
+<div class="filters">
+  <a href="{% url 'admin_applications' %}" class="filter-btn {% if not status_filter %}active{% endif %}">All</a>
+  <a href="?status=pending" class="filter-btn {% if status_filter == 'pending' %}active{% endif %}">⏳ Pending</a>
+  <a href="?status=approved" class="filter-btn {% if status_filter == 'approved' %}active{% endif %}">✅ Approved</a>
+  <a href="?status=rejected" class="filter-btn {% if status_filter == 'rejected' %}active{% endif %}">❌ Rejected</a>
+</div>
+<div class="table-card">
+  {% if applications %}
+  <table>
+    <thead><tr><th>Student</th><th>Roll No.</th><th>Route</th><th>Pickup</th><th>Duration</th><th>Fee</th><th>Status</th><th>Date</th><th>Action</th></tr></thead>
+    <tbody>
+      {% for app in applications %}
+      <tr>
+        <td><strong>{{ app.student.user.get_full_name }}</strong></td>
+        <td>{{ app.student.roll_number }}</td>
+        <td>{{ app.route.route_number }} – {{ app.route.route_name }}</td>
+        <td>{{ app.pickup_point }}</td>
+        <td>{{ app.get_duration_months_display }}</td>
+        <td>₹{{ app.total_fee }}</td>
+        <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
+        <td>{{ app.applied_at|date:"d M Y" }}</td>
+        <td><button onclick="openModal({{ app.pk }})" class="btn btn-sm btn-outline">Update</button></td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty-state"><div class="icon">📋</div><h3>No applications found</h3></div>
+  {% endif %}
+</div>
+
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal">
+    <h3>Update Application Status</h3>
+    <form method="post" id="reviewForm" action="">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Status</label>
+        <select name="status">
+          <option value="approved">✅ Approved</option>
+          <option value="rejected">❌ Rejected</option>
+          <option value="pending">⏳ Pending</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Remarks</label>
+        <textarea name="remarks" rows="3" placeholder="Optional notes..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" onclick="closeModal()" class="btn btn-outline">Cancel</button>
+        <button type="submit" class="btn btn-primary">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+<script>
+function openModal(id) {
+  document.getElementById('reviewForm').action = '/admin-panel/applications/' + id + '/update/';
+  document.getElementById('reviewModal').classList.add('open');
+}
+function closeModal() { document.getElementById('reviewModal').classList.remove('open'); }
+</script>
+{% endblock %}

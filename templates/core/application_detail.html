@@ -1,0 +1,74 @@
+{% extends 'core/base.html' %}
+{% block title %}Application #{{ app.pk }}{% endblock %}
+{% block page_title %}Application Detail{% endblock %}
+{% block content %}
+<div style="max-width:640px;">
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+      <div>
+        <div style="font-size:12px;color:#6b7280;">Application ID</div>
+        <div style="font-size:20px;font-weight:700;">#{{ app.pk }}</div>
+      </div>
+      <span class="badge badge-{{ app.status }}" style="font-size:14px;padding:6px 16px;">{{ app.get_status_display }}</span>
+    </div>
+
+    <div class="status-timeline">
+      <div class="status-step done">
+        <div class="step-dot">✓</div>
+        <div class="step-label">Applied</div>
+      </div>
+      <div class="status-step {% if app.status != 'pending' %}done{% else %}active{% endif %}">
+        <div class="step-dot">{% if app.status != 'pending' %}✓{% else %}⏳{% endif %}</div>
+        <div class="step-label">Under Review</div>
+      </div>
+      <div class="status-step {% if app.status == 'approved' or app.status == 'rejected' %}done{% endif %}">
+        <div class="step-dot">{% if app.status == 'approved' %}✓{% elif app.status == 'rejected' %}✕{% else %}—{% endif %}</div>
+        <div class="step-label">Decision</div>
+      </div>
+    </div>
+
+    <hr class="divider">
+    <div class="info-grid">
+      <div class="info-item">
+        <label>Route</label>
+        <p>{{ app.route.route_number }} — {{ app.route.route_name }}</p>
+      </div>
+      <div class="info-item">
+        <label>Pickup Point</label>
+        <p>{{ app.pickup_point }}</p>
+      </div>
+      <div class="info-item">
+        <label>Duration</label>
+        <p>{{ app.get_duration_months_display }}</p>
+      </div>
+      <div class="info-item">
+        <label>Total Fee</label>
+        <p>₹{{ app.total_fee }}</p>
+      </div>
+      <div class="info-item">
+        <label>Applied On</label>
+        <p>{{ app.applied_at|date:"d M Y, H:i" }}</p>
+      </div>
+      {% if app.valid_from %}
+      <div class="info-item">
+        <label>Valid From</label>
+        <p>{{ app.valid_from|date:"d M Y" }}</p>
+      </div>
+      <div class="info-item">
+        <label>Valid Until</label>
+        <p>{{ app.valid_until|date:"d M Y" }}</p>
+      </div>
+      {% endif %}
+    </div>
+    {% if app.admin_remarks %}
+    <hr class="divider">
+    <div class="info-item">
+      <label>Admin Remarks</label>
+      <p>{{ app.admin_remarks }}</p>
+    </div>
+    {% endif %}
+    <hr class="divider">
+    <a href="{% url 'my_applications' %}" class="btn btn-outline btn-sm">← Back</a>
+  </div>
+</div>
+{% endblock %}

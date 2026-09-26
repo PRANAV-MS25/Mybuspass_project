@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>BusPass — College Bus Pass System</title>
+{% load static %}
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<style>
+.hero { min-height: 100vh; background: linear-gradient(135deg,#1a56db,#0f3fa0); display:flex; align-items:center; justify-content:center; padding:20px; }
+.hero-card { background:white; border-radius:16px; padding:48px; max-width:520px; width:100%; text-align:center; box-shadow:0 25px 80px rgba(0,0,0,.25); }
+.hero-icon { font-size:56px; margin-bottom:20px; }
+.hero-card h1 { font-size:28px; font-weight:800; margin-bottom:8px; }
+.hero-card p { color:#6b7280; margin-bottom:32px; font-size:15px; line-height:1.6; }
+.hero-btns { display:flex; gap:12px; flex-direction:column; }
+.btn-lg { padding:13px 24px; font-size:15px; border-radius:10px; font-weight:600; }
+.features { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; margin-top:28px; }
+.feature { padding:14px; background:#f9fafb; border-radius:8px; font-size:13px; }
+.feature .icon { font-size:22px; margin-bottom:6px; }
+.feature h4 { font-weight:600; margin-bottom:3px; font-size:13px; }
+.feature p { color:#6b7280; font-size:12px; }
+.divider-text { color:#9ca3af; font-size:13px; margin:8px 0; }
+</style>
+</head>
+<body>
+<div class="hero">
+  <div class="hero-card">
+    <div class="hero-icon">🚌</div>
+    <h1>College Bus Pass System</h1>
+    <p>Apply for bus passes online, track your application status, and manage routes — all in one place.</p>
+    <div class="hero-btns">
+      <a href="{% url 'login' %}" class="btn btn-primary btn-lg">Sign In</a>
+      <div class="divider-text">— New student? —</div>
+      <a href="{% url 'register' %}" class="btn btn-outline btn-lg">Create Account</a>
+    </div>
+    <div class="features">
+      <div class="feature">
+        <div class="icon">📝</div>
+        <h4>Easy Apply</h4>
+        <p>Apply online in minutes</p>
+      </div>
+      <div class="feature">
+        <div class="icon">📡</div>
+        <h4>Live Status</h4>
+        <p>Track in real-time</p>
+      </div>
+      <div class="feature">
+        <div class="icon">🗺️</div>
+        <h4>All Routes</h4>
+        <p>Browse available routes</p>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>

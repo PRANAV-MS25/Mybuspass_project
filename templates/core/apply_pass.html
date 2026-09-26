@@ -1,0 +1,87 @@
+{% extends 'core/base.html' %}
+{% block title %}Apply for Pass{% endblock %}
+{% block page_title %}Apply for Bus Pass{% endblock %}
+{% block content %}
+<div style="max-width:680px;">
+  <div class="card">
+    <div class="card-title">📝 New Bus Pass Application</div>
+    <form method="post" id="applyForm">
+      {% csrf_token %}
+      <div class="form-group">
+        <label>Select Bus Route *</label>
+        <select name="route" id="routeSelect" required onchange="loadRouteDetails(this.value)">
+          <option value="">— Choose a route —</option>
+          {% for route in routes %}
+          <option value="{{ route.id }}">Route {{ route.route_number }} — {{ route.route_name }} (₹{{ route.monthly_fee }}/month)</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div id="routeInfo" style="display:none;" class="card" style="background:#f9fafb;">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;font-size:13px;">
+          <div><span style="color:#6b7280;">Timing</span><br><strong id="ri-timing">—</strong></div>
+          <div><span style="color:#6b7280;">Distance</span><br><strong id="ri-dist">—</strong></div>
+          <div><span style="color:#6b7280;">Monthly Fee</span><br><strong id="ri-fee">—</strong></div>
+        </div>
+      </div>
+
+      <div class="form-group" id="pickupGroup" style="display:none;">
+        <label>Pickup Point *</label>
+        <select name="pickup_point" id="pickupSelect" required>
+          <option value="">— Select pickup —</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Pass Duration *</label>
+        <select name="duration_months" id="durationSelect" onchange="calcFee()">
+          <option value="1">1 Month</option>
+          <option value="3">3 Months</option>
+          <option value="6">6 Months</option>
+          <option value="12">1 Year</option>
+        </select>
+      </div>
+
+      <div id="feeDisplay" class="fee-display" style="display:none;">
+        <div class="fee-label">Total Fee</div>
+        <div class="fee-amount" id="totalFee">₹0</div>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:20px;">
+        <button type="submit" class="btn btn-primary">Submit Application</button>
+        <a href="{% url 'dashboard' %}" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+let monthlyFee = 0;
+function loadRouteDetails(routeId) {
+  const info = document.getElementById('routeInfo');
+  const pickupGroup = document.getElementById('pickupGroup');
+  if (!routeId) { info.style.display='none'; pickupGroup.style.display='none'; return; }
+  fetch(`/api/route/${routeId}/`)
+    .then(r => r.json())
+    .then(data => {
+      document.getElementById('ri-timing').textContent = data.start_time + ' – ' + data.end_time;
+      document.getElementById('ri-dist').textContent = data.distance_km + ' km';
+      document.getElementById('ri-fee').textContent = '₹' + data.monthly_fee + '/mo';
+      monthlyFee = data.monthly_fee;
+      const sel = document.getElementById('pickupSelect');
+      sel.innerHTML = '<option value="">— Select pickup —</option>';
+      data.pickup_points.forEach(p => { const o = document.createElement('option'); o.value=p; o.textContent=p; sel.appendChild(o); });
+      info.style.display = 'block';
+      pickupGroup.style.display = 'block';
+      calcFee();
+    });
+}
+function calcFee() {
+  if (!monthlyFee) return;
+  const dur = parseInt(document.getElementById('durationSelect').value);
+  const total = (monthlyFee * dur).toFixed(2);
+  document.getElementById('totalFee').textContent = '₹' + total;
+  document.getElementById('feeDisplay').style.display = 'block';
+}
+</script>
+{% endblock %}

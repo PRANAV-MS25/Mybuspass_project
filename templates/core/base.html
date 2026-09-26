@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{% block title %}BusPass{% endblock %} — College Bus Pass System</title>
+{% load static %}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="app-layout">
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-brand">
+        <div class="icon">🚌</div>
+        <div>
+          <h2>BusPass</h2>
+          <span>College Transit System</span>
+        </div>
+      </div>
+    </div>
+    <div class="sidebar-user">
+      <div class="user-avatar">{{ request.user.first_name.0|upper }}{{ request.user.last_name.0|upper }}</div>
+      <div>
+        <div class="user-name">{{ request.user.get_full_name }}</div>
+        <div class="user-role">{% if request.user.is_staff %}Administrator{% else %}Student{% endif %}</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      {% if request.user.is_staff %}
+        <div class="nav-section-label">Admin Panel</div>
+        <a href="{% url 'admin_dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'admin_dashboard' %}active{% endif %}">
+          <span class="icon">📊</span> Dashboard
+        </a>
+        <a href="{% url 'admin_applications' %}" class="nav-link {% if 'applications' in request.resolver_match.url_name %}active{% endif %}">
+          <span class="icon">📋</span> Applications
+        </a>
+        <a href="{% url 'admin_routes' %}" class="nav-link {% if 'route' in request.resolver_match.url_name %}active{% endif %}">
+          <span class="icon">🗺️</span> Bus Routes
+        </a>
+        <a href="{% url 'admin_students' %}" class="nav-link {% if 'students' in request.resolver_match.url_name %}active{% endif %}">
+          <span class="icon">👥</span> Students
+        </a>
+      {% else %}
+        <div class="nav-section-label">Student Portal</div>
+        <a href="{% url 'dashboard' %}" class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}">
+          <span class="icon">🏠</span> Dashboard
+        </a>
+        <a href="{% url 'apply_pass' %}" class="nav-link {% if request.resolver_match.url_name == 'apply_pass' %}active{% endif %}">
+          <span class="icon">➕</span> Apply for Pass
+        </a>
+        <a href="{% url 'my_applications' %}" class="nav-link {% if request.resolver_match.url_name == 'my_applications' %}active{% endif %}">
+          <span class="icon">📁</span> My Applications
+        </a>
+      {% endif %}
+    </nav>
+    <div class="sidebar-footer">
+      <a href="{% url 'logout' %}" class="btn btn-outline btn-block btn-sm">
+        <span>🚪</span> Sign Out
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="main-content">
+    <header class="topbar">
+      <div class="page-title">{% block page_title %}{% endblock %}</div>
+      <div class="topbar-actions">{% block topbar_actions %}{% endblock %}</div>
+    </header>
+    <main class="content">
+      {% if messages %}
+        {% for msg in messages %}
+          <div class="alert alert-{% if msg.tags == 'error' %}error{% else %}{{ msg.tags }}{% endif %}">
+            {% if msg.tags == 'success' %}✅{% elif msg.tags == 'error' %}❌{% else %}ℹ️{% endif %}
+            {{ msg }}
+          </div>
+        {% endfor %}
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+</div>
+</body>
+</html>

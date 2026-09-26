@@ -1,0 +1,104 @@
+{% extends 'core/base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block topbar_actions %}
+  <a href="{% url 'apply_pass' %}" class="btn btn-primary btn-sm">+ Apply for Pass</a>
+{% endblock %}
+{% block content %}
+<div class="stats-grid">
+  <div class="stat-card blue">
+    <div class="label">Total Applications</div>
+    <div class="value">{{ stats.total }}</div>
+  </div>
+  <div class="stat-card yellow">
+    <div class="label">Pending</div>
+    <div class="value">{{ stats.pending }}</div>
+  </div>
+  <div class="stat-card green">
+    <div class="label">Approved</div>
+    <div class="value">{{ stats.approved }}</div>
+  </div>
+  <div class="stat-card red">
+    <div class="label">Rejected</div>
+    <div class="value">{{ stats.rejected }}</div>
+  </div>
+</div>
+
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;">
+  <div class="card">
+    <div class="card-title">👤 My Profile</div>
+    <div class="info-grid">
+      <div class="info-item">
+        <label>Full Name</label>
+        <p>{{ profile.user.get_full_name }}</p>
+      </div>
+      <div class="info-item">
+        <label>Roll Number</label>
+        <p>{{ profile.roll_number }}</p>
+      </div>
+      <div class="info-item">
+        <label>Department</label>
+        <p>{{ profile.department }}</p>
+      </div>
+      <div class="info-item">
+        <label>Year</label>
+        <p>{{ profile.get_year_display }}</p>
+      </div>
+      <div class="info-item">
+        <label>Phone</label>
+        <p>{{ profile.phone }}</p>
+      </div>
+      <div class="info-item">
+        <label>Email</label>
+        <p>{{ profile.user.email }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🚌 Quick Actions</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <a href="{% url 'apply_pass' %}" class="btn btn-primary">📝 Apply for New Pass</a>
+      <a href="{% url 'my_applications' %}" class="btn btn-outline">📁 View All Applications</a>
+    </div>
+    {% if stats.approved > 0 %}
+    <div style="margin-top:16px;padding:14px;background:#def7ec;border-radius:8px;">
+      <div style="font-weight:600;color:#057a55;font-size:13px;">✅ You have an active pass!</div>
+      <div style="font-size:12px;color:#065f46;margin-top:3px;">View details in My Applications</div>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+{% if applications %}
+<div class="table-card">
+  <div class="table-header">
+    <h3>Recent Applications</h3>
+    <a href="{% url 'my_applications' %}" class="btn btn-outline btn-sm">View All</a>
+  </div>
+  <table>
+    <thead><tr><th>Route</th><th>Pickup Point</th><th>Duration</th><th>Fee</th><th>Status</th><th>Date</th></tr></thead>
+    <tbody>
+      {% for app in applications %}
+      <tr>
+        <td><strong>{{ app.route.route_number }}</strong><br><span style="color:#6b7280;font-size:12px;">{{ app.route.route_name }}</span></td>
+        <td>{{ app.pickup_point }}</td>
+        <td>{{ app.get_duration_months_display }}</td>
+        <td>₹{{ app.total_fee }}</td>
+        <td><span class="badge badge-{{ app.status }}">{{ app.get_status_display }}</span></td>
+        <td>{{ app.applied_at|date:"d M Y" }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% else %}
+<div class="card">
+  <div class="empty-state">
+    <div class="icon">🎫</div>
+    <h3>No applications yet</h3>
+    <p>Apply for your first bus pass to get started</p>
+    <a href="{% url 'apply_pass' %}" class="btn btn-primary" style="margin-top:16px;">Apply Now</a>
+  </div>
+</div>
+{% endif %}
+{% endblock %}
