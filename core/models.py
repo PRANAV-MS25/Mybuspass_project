@@ -27,7 +27,7 @@ class BusRoute(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Route {self.route_number} - {self.route_name}"
+        return f"Route {self.route_number} - {self.route_name} (₹{self.monthly_fee}/month)"
 
     def pickup_list(self):
         return [p.strip() for p in self.pickup_points.split(',')]
@@ -65,5 +65,7 @@ class BusPassApplication(models.Model):
         return f"{self.student} - Route {self.route.route_number} ({self.status})"
 
     def save(self, *args, **kwargs):
-        self.total_fee = self.route.monthly_fee * self.duration_months
+        # Automatically calculates total fee based on the selected route's monthly fee and duration
+        if self.route and self.duration_months:
+            self.total_fee = self.route.monthly_fee * self.duration_months
         super().save(*args, **kwargs)

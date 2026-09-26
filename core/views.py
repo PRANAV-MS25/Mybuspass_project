@@ -3,11 +3,15 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.contrib import messages
-from django.http import JsonResponse
+from django.http import JsonResponse, FileResponse, Http404
 from django.utils import timezone
+from django.core.mail import EmailMessage
+from django.conf import settings
 from datetime import date, timedelta
+import os
 from .models import StudentProfile, BusRoute, BusPassApplication
 from .forms import StudentRegistrationForm, BusPassApplicationForm, BusRouteForm
+from .utils import generate_bus_pass_pdf
 
 
 # ─── Auth Views ───────────────────────────────────────────────────────────────
@@ -141,6 +145,27 @@ def get_route_details(request, route_id):
     })
 
 
+@login_required
+def download_bus_pass_pdf(request, pk):
+    try:
+        application = BusPassApplication.objects.get(pk=pk)
+    except BusPassApplication.DoesNotExist:
+        raise Http404("Bus pass application not found")
+
+    # Security check: Ensure student owns the pass or user is admin
+    if not request.user.is_superuser and application.student.user != request.user:
+        raise Http404("Access denied")
+
+    if application.status != 'approved':
+        raise Http404("Pass is not approved yet.")
+
+    # Temp file generation
+    pdf_path = os.path.join(settings.BASE_DIR, f"bus_pass_{application.id}.pdf")
+    generate_bus_pass_pdf(application, pdf_path)
+
+    return FileResponse(open(pdf_path, 'rb'), as_attachment=True, filename=f"Bus_Pass_{application.route.route_number}.pdf")
+
+
 # ─── Admin Views ───────────────────────────────────────────────────────────────
 
 def admin_required(view_func):
@@ -178,6 +203,21 @@ def admin_applications(request):
     })
 
 
+def send_approved_pass_email(application):
+    """Helper to email the pass PDF via configured SMTP settings"""
+    pdf_path = os.path.join(settings.BASE_DIR, f"bus_pass_{application.id}.pdf")
+    generate_bus_pass_pdf(application, pdf_path)
+
+    subject = f"Your College Bus Pass is Approved! (Route {application.route.route_number})"
+    message = f"Hello {application.student.user.get_full_name()},\n\nYour bus pass application for Route {application.route.route_number} ({application.route.route_name}) has been approved.\n\nYour pass is attached as a PDF to this email. You can also download it anytime from your dashboard.\n\nRegards,\nCollege Transport Department"
+    
+    recipient_email = application.student.user.email
+    if recipient_email:
+        email = EmailMessage(subject, message, settings.DEFAULT_FROM_EMAIL, [recipient_email])
+        email.attach_file(pdf_path)
+        email.send(fail_silently=False)
+
+
 @admin_required
 def admin_update_status(request, pk):
     app = get_object_or_404(BusPassApplication, pk=pk)
@@ -190,7 +230,14 @@ def admin_update_status(request, pk):
             if new_status == 'approved':
                 app.valid_from = date.today()
                 app.valid_until = date.today() + timedelta(days=30 * app.duration_months)
-            app.save()
+                app.save()
+                # Automatically send email via SMTP when approved
+                try:
+                    send_approved_pass_email(app)
+                except Exception as e:
+                    print(f"Email failed to send: {e}")
+            else:
+                app.save()
             messages.success(request, f'Application {new_status} successfully.')
     return redirect('admin_applications')
 

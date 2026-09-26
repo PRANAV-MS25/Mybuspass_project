@@ -5,7 +5,7 @@ from datetime import time
 import os
 
 class Command(BaseCommand):
-    help = 'Seed initial data: admin user + sample routes'
+    help = 'Seed initial data: admin user + real Bengaluru routes'
 
     def handle(self, *args, **kwargs):
         # Create admin — use env vars on Render, fallback for local dev
@@ -17,22 +17,50 @@ class Command(BaseCommand):
             self.stdout.write('Admin already exists — skipping')
 
         routes = [
-            {'route_number': 'R01', 'route_name': 'City Center – College',
-             'pickup_points': 'City Bus Stand, Gandhi Nagar, MG Road, Railway Station, College Gate',
-             'start_time': time(7, 30), 'end_time': time(8, 30), 'distance_km': 12.5, 'monthly_fee': 650},
-            {'route_number': 'R02', 'route_name': 'East Zone – College',
-             'pickup_points': 'East Market, Nehru Park, Sector 5, Old Town, College Main Entrance',
-             'start_time': time(7, 0), 'end_time': time(8, 15), 'distance_km': 18.0, 'monthly_fee': 850},
-            {'route_number': 'R03', 'route_name': 'North Campus Circuit',
-             'pickup_points': 'North Bus Depot, Vijay Nagar, Shivaji Park, University Road, College',
-             'start_time': time(7, 45), 'end_time': time(8, 45), 'distance_km': 9.0, 'monthly_fee': 500},
-            {'route_number': 'R04', 'route_name': 'South Town Express',
-             'pickup_points': 'South Gate, Lal Chowk, Bank Colony, ITI Road, College Back Gate',
-             'start_time': time(6, 45), 'end_time': time(8, 0), 'distance_km': 22.0, 'monthly_fee': 1000},
+            {
+                'route_number': 'RT-01', 
+                'route_name': 'Jayanagar to Campus',
+                'pickup_points': 'Jayanagar 4th Block, Banashankari Temple, JP Nagar 3rd Phase, College Gate',
+                'start_time': time(7, 30), 
+                'end_time': time(8, 45), 
+                'distance_km': 18.5, 
+                'monthly_fee': 850.00
+            },
+            {
+                'route_number': 'RT-02', 
+                'route_name': 'Hebbal to Campus',
+                'pickup_points': 'Hebbal Flyover, Hebbal Kempapura, Esteem Mall, College Main Entrance',
+                'start_time': time(7, 15), 
+                'end_time': time(8, 50), 
+                'distance_km': 24.0, 
+                'monthly_fee': 1200.00
+            },
+            {
+                'route_number': 'RT-03', 
+                'route_name': 'Electronic City to Campus',
+                'pickup_points': 'Electronic City Phase 1, Bommasandra, Silk Board, University Road, College',
+                'start_time': time(7, 0), 
+                'end_time': time(8, 40), 
+                'distance_km': 28.5, 
+                'monthly_fee': 1500.00
+            },
+            {
+                'route_number': 'RT-04', 
+                'route_name': 'Whitefield to Campus',
+                'pickup_points': 'Whitefield ITPL, Marathahalli Bridge, KR Puram, College Back Gate',
+                'start_time': time(7, 10), 
+                'end_time': time(8, 55), 
+                'distance_km': 30.0, 
+                'monthly_fee': 1400.00
+            },
         ]
 
         for r in routes:
-            _, created = BusRoute.objects.get_or_create(route_number=r['route_number'], defaults=r)
-            self.stdout.write(('Created' if created else 'Exists') + f': Route {r["route_number"]}')
+            # update_or_create ensures fees/names update if you change them here
+            _, created = BusRoute.objects.update_or_create(
+                route_number=r['route_number'], 
+                defaults=r
+            )
+            self.stdout.write(('Created' if created else 'Updated') + f': Route {r["route_number"]} - {r["route_name"]}')
 
-        self.stdout.write(self.style.SUCCESS('Seed complete!'))
+        self.stdout.write(self.style.SUCCESS('Bengaluru route seed complete!'))
